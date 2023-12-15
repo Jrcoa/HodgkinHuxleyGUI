@@ -8,6 +8,14 @@ from threading import Thread
 
 class GUI:
     def __init__(self, master, figure, ax):
+        """TKinter gui for simulating H-H model
+
+        Args:
+            master (_type_): _description_
+            figure (_type_): _description_
+            ax (_type_): _description_
+        """
+        # This image is an error screen
         self.im = Image.open("C:\\workspace\\math_modeling_final\\resources\\exploded.png")
         
         self.master = master
@@ -27,9 +35,9 @@ class GUI:
         Tk.report_callback_exception = self.error_screen
         
         self.update_canvas()     
-
     
     def error_screen(self, e, _, _2):
+        """For when the model explodes"""
         print(e)
         self.canvas.get_tk_widget().pack_forget()
         self.image_label.pack(side=TOP, fill=BOTH, expand=1)
@@ -37,7 +45,7 @@ class GUI:
         self.master.after(100, self.update_canvas)
 
     def create_widgets(self):
-        # Create a button to trigger the Matplotlib plot
+        # Following scales are all the parameters
         self.Scales = Frame(self.master)
         self.T_scale = Scale(self.Scales, variable=DoubleVar(value=25), orient=VERTICAL, cursor="dot", label="Max Time", resolution=0.01, from_=100, to=-5, name="t")
         self.T_scale.grid(row=1, column=1)
@@ -59,6 +67,7 @@ class GUI:
         cm_scale.grid(row=1, column=9) 
         self.Scales.pack(side=TOP)
         
+        # radio buttons for the type of solver being used
         self.Radios = Frame(self.master)
         self.solver_selector = IntVar(value=4)
         Radiobutton(self.Radios, text="Forward Euler",  variable = self.solver_selector, value = 1).grid(row = 0, column = 0)
@@ -66,13 +75,15 @@ class GUI:
         Radiobutton(self.Radios, text="Adams-Bashforth",  variable = self.solver_selector, value = 3).grid(row = 1, column = 0)
         Radiobutton(self.Radios, text="Numpy",   variable = self.solver_selector, value = 4).grid(row = 1, column = 1)
         self.Radios.pack()
+        
     def create_plot(self):
         self.canvas = FigureCanvasTkAgg(self.figure, master=self.master)
         self.canvas.draw()
         self.canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
     
     def update_canvas(self):
-        
+        """This method updates the canvas with a new approximation of the system according to the values on the scales
+        """
         if self.error:
             self.image_label.pack_forget()
             self.canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
@@ -99,15 +110,15 @@ class GUI:
         self.master.after(100, self.update_canvas)
         
 if __name__ == "__main__":
-    # Example: Create a Matplotlib figure
-    example_figure = Figure(figsize=(5, 4), dpi=150)
-    ax = example_figure.add_subplot(1, 1, 1)
+    # matplotlib figure to display and update
+    base_figure = Figure(figsize=(5, 4), dpi=150)
+    ax = base_figure.add_subplot(1, 1, 1)
 
     # Create the main Tkinter window and MatplotlibTkinterGUI instance
     root = Tk()
     
     
-    app = GUI(root, figure=example_figure, ax=ax)
+    app = GUI(root, figure=base_figure, ax=ax)
 
     # Run the Tkinter event loop
     root.mainloop()
